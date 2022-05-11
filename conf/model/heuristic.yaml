@@ -1,0 +1,14 @@
+# @package _global_
+preprocessor:
+  _target_: src.preprocessors.Pipeline
+  text_normalizer:
+    _target_: src.preprocessors.CaseNormalizer
+    columns:
+      - text
+  text_selector:
+    _target_: src.preprocessors.ColumnSelector
+    column: text
+
+classifier:
+  _target_: src.models.HeuristicModel
+    

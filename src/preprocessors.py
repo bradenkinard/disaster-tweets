@@ -1,18 +1,18 @@
 from abc import ABC, abstractmethod
 
 class Pipeline:
-    def __init__(self, *stages):
+    def __init__(self, **stages):
         self.stages = stages
 
     def transform(self, X):
         Xc = X.copy()
-        for stage in self.stages:
+        for stage in self.stages.values():
             Xc = stage.transform(Xc)
         return Xc
     
     def fit_transform(self, X):
         Xc = X.copy()
-        for stage in self.stages:
+        for stage in self.stages.values():
             Xc = stage.fit_transform(Xc)
         return Xc
 
@@ -27,6 +27,11 @@ class BasePreprocessor(ABC):
 
     def fit_transform(self, X):
         return self.fit(X).transform(X)
+
+
+class NullProcessor(BasePreprocessor):
+    def transform(self, X):
+        return X
 
 
 class CaseNormalizer(BasePreprocessor):

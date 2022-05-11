@@ -1,30 +1,36 @@
+import logging
+import hydra
+from hydra.utils import instantiate, get_original_cwd
+from omegaconf import DictConfig
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from src.preprocessors import ColumnSelector, Pipeline, CaseNormalizer
-from src.models import RuleBaselineModel
 
-pipeline = Pipeline(
-    CaseNormalizer(columns=['text']),
-    ColumnSelector(column='text')
-)
-model = RuleBaselineModel()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-data = pd.read_csv('data/train.csv')
-train, test = train_test_split(data, random_state=1234)
+@hydra.main(config_path='conf', config_name='config')
+def main(cfg: DictConfig) -> None:
+    preprocessor = instantiate(cfg.preprocessor)
+    clf = instantiate(cfg.classifier)
+    
+    data = pd.read_csv(get_original_cwd() + '/data/train.csv')
+    train, test = train_test_split(data, random_state=1234)
+    X_train, y_train = preprocessor.fit_transform(train), train['target'].values
+    X_test, y_test = preprocessor.transform(test), test['target'].values
 
-X_train, y_train = pipeline.fit_transform(train), train['target'].values
-X_test, y_test = pipeline.transform(test), test['target'].values
+    # Training
+    clf.train(X_train, y_train)
 
-# Training
-model.train(X_train, y_train)
+    # Prediction
+    y_pred = clf.predict(X_test)
 
-# Prediction
-y_pred = model.predict(X_test)
+    # Assessment
+    logger.info(
+        "Model test accuracy: %s",
+        accuracy_score(y_true=y_test, y_pred=y_pred)
+    )
 
-# Assessment
-naive_accuracy = sum(y_test) / len(y_test)
-naive_accuracy = naive_accuracy if naive_accuracy > 0.5 else (1 - naive_accuracy)
 
-print(f"Naive test accuracy: {naive_accuracy}")
-print(f"Model test accuracy: {accuracy_score(y_true=y_test, y_pred=y_pred)}")
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,9 @@
+# @package _global_
+preprocessor:
+  _target_: src.preprocessors.Pipeline
+  null_processor:
+    _target_: src.preprocessors.NullProcessor
+
+classifier:
+  _target_: src.models.NaiveModel
+    
