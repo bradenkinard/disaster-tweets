@@ -1,0 +1,11 @@
+# @package _global_
+preprocessor:
+  _target_: sklearn.feature_extraction.text.CountVectorizer
+  stop_words: english
+  max_features: null 
+  preprocessor:
+    _partial_: true
+    _target_: src.preprocessors.clean_doc
+
+classifier:
+  _target_: sklearn.svm.LinearSVC
