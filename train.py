@@ -21,21 +21,16 @@ def main(cfg: DictConfig) -> None:
 
     # Training
     X_train = preprocessor.fit_transform(X_train)
-    clf.train(X_train, y_train)
+    clf.fit(X_train, y_train)
 
     # Prediction
     X_test = preprocessor.transform(X_test)
     y_pred = clf.predict(X_test)
-    y_pred_prob = clf.predict_proba(X_test)
 
     # Assessment
     logger.info(
         "Test accuracy: %s",
         accuracy_score(y_true=y_test, y_pred=y_pred)
-    )
-    logger.info(
-        "Test ROC AOC Score: %s",
-        roc_auc_score(y_true=y_test, y_score=y_pred_prob)
     )
     logger.info(
         "Test precision: %s",
