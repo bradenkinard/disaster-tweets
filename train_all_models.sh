@@ -1,0 +1,1 @@
+python train.py -m model=naive,heuristic,naive_bayes,logistic
